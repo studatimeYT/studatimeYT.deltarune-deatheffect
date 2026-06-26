@@ -1,0 +1,16 @@
+{
+    "geode": "3.0.0-beta.1",
+    "id": "studatimeYT.deltarune-explosion",
+    "version": "1.0.0",
+    "name": 'Deltarune explosion",
+    "developer": "studatimeYT",
+    "description": "Replace death effect 19 with deltarune explosion!",
+    "resources": {
+        "sprites": [
+            "boom-explosion_*.png"
+        ],
+        "files": [
+            "explode_11.ogg"
+        ]
+    }
+}

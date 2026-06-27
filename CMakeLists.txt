@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 3.13.4)
 
-project(deltarune-explosion)
+project(deltarune-deatheffect)
 
 find_package(geode REQUIRED)
 
-setup_geode_mod(studatimeYT.deltarune-explosion)
+setup_geode_mod(studatimeYT.deltarune-deatheffect)
 
-target_sources(studatimeYT.deltarune-explosion PRIVATE src/main.cpp)
+target_sources(studatimeYT.deltarune-deatheffect PRIVATE src/main.cpp)

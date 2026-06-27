@@ -10,12 +10,12 @@ class $modify(PlayLayer) {
         bool usingEffect19 = (gm->m_playerDeathEffect == 18);
 
         if (usingEffect19) {
-            // 1. Fixed the literal tag to use the correct _spr marker
+            // Play custom audio asset safely from your files block
             FMODAudioEngine::sharedEngine()->playEffect("explode_11.ogg"_spr);
             
             auto playerPos = player->getPosition();
             
-            // 2. Load from the compiled sprite sheet sheet instead of searching raw files
+            // Load the first frame out of the compiled sprite sheet
             auto explosionSprite = CCSprite::createWithSpriteFrameName("boom-explosion_01.png");
             if (explosionSprite) {
                 explosionSprite->setPosition(playerPos);
@@ -24,7 +24,7 @@ class $modify(PlayLayer) {
                 auto animation = CCAnimation::create();
                 auto cache = CCSpriteFrameCache::sharedSpriteFrameCache();
 
-                // 3. Loop through your 17 frames safely using the sprite cache framework
+                // Loop to build the 17-frame animation from the cache
                 for (int i = 1; i <= 17; i++) {
                     std::string frameName = fmt::format("boom-explosion_{:02d}.png", i);
                     auto frame = cache->spriteFrameByName(frameName.c_str());
@@ -42,7 +42,7 @@ class $modify(PlayLayer) {
                 
                 explosionSprite->runAction(sequence);
                 
-                // Add to the object layer so it renders behind UI elements properly
+                // Add sprite to the active gameplay object layer
                 if (this->m_objectLayer) {
                     this->m_objectLayer->addChild(explosionSprite, 100); 
                 } else {
@@ -51,7 +51,7 @@ class $modify(PlayLayer) {
             }
         }
 
-        // Always call the original function so the player actually dies!
+        // Run standard base game logic so death registration finishes
         PlayLayer::destroyPlayer(player, p1);
     }
 };

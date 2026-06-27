@@ -1,7 +1,10 @@
 cmake_minimum_required(VERSION 3.13.4)
 
-# Force the project name to match your exact Mod ID string
+# Create your project match tracking name
 project(studatimeYT.deltarune-deatheffect)
+
+# 🚀 THE FIX: This forces CMake to look at the automated Geode SDK location
+list(APPEND CMAKE_MODULE_PATH CMAKE_CURRENT_SOURCE_PATH)
 
 find_package(Geode REQUIRED)
 

@@ -37,11 +37,8 @@ jobs:
             echo "$HOME/custom-geode-cli" >> $GITHUB_PATH
             export PATH="$HOME/custom-geode-cli:$PATH"
             
-            # 🚀 THE FIX: Create dummy profile directory and file for Windows
-            mkdir -p "$vivid_profile_path" # safety
-            mkdir -p "$LOCALAPPDATA/Geode"
-            echo '{"current-profile": "default", "profiles": {"default": {"name": "default", "gd-path": "C:\\"}}}' > "$LOCALAPPDATA/Geode/config.json"
-            
+            # 🚀 THE FIX: Use the native CLI command to generate a profile silently
+            geode config setup --interactive false
             geode sdk install
           else
             curl -LO https://github.com/geode-sdk/cli/releases/latest/download/geode-cli-v3.7.4-linux.zip
@@ -51,10 +48,8 @@ jobs:
             echo "$HOME/custom-geode-cli" >> $GITHUB_PATH
             export PATH="$HOME/custom-geode-cli:$PATH"
             
-            # 🚀 THE FIX: Create dummy profile directory and file for Linux/Android
-            mkdir -p "$HOME/.config/Geode"
-            echo '{"current-profile": "default", "profiles": {"default": {"name": "default", "gd-path": "/"}}}' > "$HOME/.config/Geode/config.json"
-            
+            # 🚀 THE FIX: Use the native CLI command to generate a profile silently
+            geode config setup --interactive false
             geode sdk install
           fi
         shell: bash

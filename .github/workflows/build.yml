@@ -29,6 +29,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # This creates the dummy configuration so the CLI doesn't ask interactive questions
       - name: Install Geode CLI and SDK
         run: |
           if [ "${{ matrix.config.os }}" = "windows-latest" ]; then
@@ -37,8 +38,9 @@ jobs:
             echo "$HOME/custom-geode-cli" >> $GITHUB_PATH
             export PATH="$HOME/custom-geode-cli:$PATH"
             
-            # 🚀 THE FIX: Use the native CLI command to generate a profile silently
-            geode config setup --interactive false
+            mkdir -p "$LOCALAPPDATA/Geode"
+            echo '{"current-profile":"default","profiles":{"default":{"name":"default","gd-path":"C:\\"}}}' > "$LOCALAPPDATA/Geode/config.json"
+            
             geode sdk install
           else
             curl -LO https://github.com/geode-sdk/cli/releases/latest/download/geode-cli-v3.7.4-linux.zip
@@ -48,8 +50,9 @@ jobs:
             echo "$HOME/custom-geode-cli" >> $GITHUB_PATH
             export PATH="$HOME/custom-geode-cli:$PATH"
             
-            # 🚀 THE FIX: Use the native CLI command to generate a profile silently
-            geode config setup --interactive false
+            mkdir -p "$HOME/.config/Geode"
+            echo '{"current-profile":"default","profiles":{"default":{"name":"default","gd-path":"/"}}}' > "$HOME/.config/Geode/config.json"
+            
             geode sdk install
           fi
         shell: bash

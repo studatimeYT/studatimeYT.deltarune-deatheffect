@@ -29,7 +29,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # 🚀 FIXED: Switched from @v2 to @main to support modern Geode v3 environments cleanly
+      # This officially sets up the CLI tools and downloads the pre-built loader binaries automatically!
+      - name: Setup Geode CLI
+        uses: geode-sdk/cli/.github/actions/setup@main
+
       - name: Build the mod
         uses: geode-sdk/build-geode-mod@main
         with:
@@ -42,7 +45,6 @@ jobs:
     needs: ['build']
 
     steps:
-      # 🚀 FIXED: Switched from /combine@v2 to /combine@main
       - uses: geode-sdk/build-geode-mod/combine@main
         id: build
 

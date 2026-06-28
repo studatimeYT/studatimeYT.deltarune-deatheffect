@@ -29,7 +29,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # 🚀 THE FIX: This action handles the modern Geode v3 SDK CLI setup perfectly
+      - name: Clean conflicting CLI paths
+        run: rm -rf my-epic-geode-cli
+        shell: bash
+
       - name: Setup Geode CLI
         uses: geode-sdk/cli/.github/actions/setup@main
 

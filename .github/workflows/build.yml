@@ -29,22 +29,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # 🚀 THE FIX: Installs Geode CLI manually and uses '-y' to force-skip the 7-Zip prompt crash!
-      # It runs on both Windows and Linux runners safely.
-      - name: Install Geode CLI Manually
-        run: |
-          if [ "${{ matrix.config.os }}" = "windows-latest" ]; then
-            curl -LO https://github.com/geode-sdk/cli/releases/latest/download/geode-cli-v3.7.4-win.zip
-            7z x geode-cli-v3.7.4-win.win.zip -y -o"$HOME/.geode/bin"
-            echo "$HOME/.geode/bin" >> $GITHUB_PATH
-          else
-            curl -LO https://github.com/geode-sdk/cli/releases/latest/download/geode-cli-v3.7.4-linux.zip
-            mkdir -p $HOME/.geode/bin
-            unzip -o geode-cli-v3.7.4-linux.zip -d $HOME/.geode/bin
-            chmod +x $HOME/.geode/bin/geode
-            echo "$HOME/.geode/bin" >> $GITHUB_PATH
-          fi
-        shell: bash
+      # 🚀 THE REAL FIX: This is the official Geode v3 action path.
+      # It natively installs everything safely without 7-Zip prompt or path errors.
+      - name: Set up Geode CLI
+        uses: geode-sdk/actions/setup@main
 
       - name: Build the mod
         uses: geode-sdk/build-geode-mod@main

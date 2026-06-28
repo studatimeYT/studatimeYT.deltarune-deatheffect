@@ -29,10 +29,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # 🚀 THE REAL FIX: This is the official Geode v3 action path.
-      # It natively installs everything safely without 7-Zip prompt or path errors.
+      # 🚀 THE FIX: Correctly points to the setup subfolder inside the main build repository
       - name: Set up Geode CLI
-        uses: geode-sdk/actions/setup@main
+        uses: geode-sdk/build-geode-mod/setup@main
 
       - name: Build the mod
         uses: geode-sdk/build-geode-mod@main

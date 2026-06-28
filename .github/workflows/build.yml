@@ -29,12 +29,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # 🚀 THE FIX: Correctly points to the setup subfolder inside the main build repository
-      - name: Set up Geode CLI
-        uses: geode-sdk/build-geode-mod/setup@main
-
+      # 🚀 THE FIX: Uses the stable release version which handles the CLI configuration 
+      # automatically in the background without needing a separate setup line.
       - name: Build the mod
-        uses: geode-sdk/build-geode-mod@main
+        uses: geode-sdk/build-geode-mod@v2
         with:
           combine: true
           target: ${{ matrix.config.target }}
@@ -45,7 +43,7 @@ jobs:
     needs: ['build']
 
     steps:
-      - uses: geode-sdk/build-geode-mod/combine@main
+      - uses: geode-sdk/build-geode-mod/combine@v2
         id: build
 
       - uses: actions/upload-artifact@v4

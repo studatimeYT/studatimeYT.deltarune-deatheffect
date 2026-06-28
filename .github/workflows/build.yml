@@ -29,12 +29,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Clean conflicting CLI paths
-        run: rm -rf my-epic-geode-cli
-        shell: bash
-
+      # 🚀 THE FIX: Switched from @main to @v3 to use the stable, non-conflicting extraction routine
       - name: Setup Geode CLI
-        uses: geode-sdk/cli/.github/actions/setup@main
+        uses: geode-sdk/cli/.github/actions/setup@v3
 
       - name: Build the mod
         uses: geode-sdk/build-geode-mod@main

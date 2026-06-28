@@ -29,9 +29,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # This officially sets up the CLI tools and downloads the pre-built loader binaries automatically!
-      - name: Setup Geode CLI
-        uses: geode-sdk/cli/.github/actions/setup@main
+      - name: Install Geode CLI
+        run: |
+          if [ "${{ matrix.config.os }}" = "windows-latest" ]; then
+            curl -LO https://github.com/geode-sdk/cli/releases/latest/download/geode-cli-v3.7.4-win.zip
+            7z x geode-cli-v3.7.4-win.zip -y -o"$HOME/custom-geode-cli"
+            echo "$HOME/custom-geode-cli" >> $GITHUB_PATH
+          else
+            curl -LO https://github.com/geode-sdk/cli/releases/latest/download/geode-cli-v3.7.4-linux.zip
+            mkdir -p $HOME/custom-geode-cli
+            unzip -o geode-cli-v3.7.4-linux.zip -d $HOME/custom-geode-cli
+            chmod +x $HOME/custom-geode-cli/geode
+            echo "$HOME/custom-geode-cli" >> $GITHUB_PATH
+          fi
+        shell: bash
 
       - name: Build the mod
         uses: geode-sdk/build-geode-mod@main

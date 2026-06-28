@@ -29,10 +29,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # 🚀 THE FIX: Switched from @main to @v3 to use the stable, non-conflicting extraction routine
-      - name: Setup Geode CLI
-        uses: geode-sdk/cli/.github/actions/setup@v3
-
+      # 🚀 THE FIX: This single action automatically configures its own internal CLI environment
+      # without running into external 7-Zip overwrite conflicts.
       - name: Build the mod
         uses: geode-sdk/build-geode-mod@main
         with:

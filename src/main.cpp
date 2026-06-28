@@ -1,5 +1,7 @@
 #include <Geode/Geode.hpp>
 #include <Geode/modify/PlayLayer.hpp>
+#include <sstream>
+#include <iomanip>
 
 using namespace geode::prelude;
 
@@ -13,10 +15,13 @@ class $modify(PlayLayer) {
         // 2. Create an animation sequence using your 17 sprite frames
         auto animation = CCAnimation::create();
         for (int i = 1; i <= 17; i++) {
-            std::string frameName = fmt::format("boom-explosion_{:02d}.png", i);
+            // Safe, standard C++ way to format "boom-explosion_01.png", "boom-explosion_02.png", etc.
+            std::stringstream ss;
+            ss << "boom-explosion_" << std::setw(2) << std::setfill('0') << i << ".png";
+            std::string frameName = ss.str();
+
             auto frame = CCSpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName(frameName.c_str());
             if (frame) {
-                // FIXED: Changed addProductFrame to addSpriteFrame
                 animation->addSpriteFrame(frame);
             }
         }
@@ -24,9 +29,10 @@ class $modify(PlayLayer) {
 
         // 3. Create the sprite, apply the animation, and add it to the screen
         auto explosionSprite = CCSprite::createWithSpriteFrameName("boom-explosion_01.png");
-        explosionSprite->setPosition(player->getPosition());
-        explosionSprite->runAction(CCAnimate::create(animation));
-        
-        this->addChild(explosionSprite, 100);
+        if (explosionSprite) {
+            explosionSprite->setPosition(player->getPosition());
+            explosionSprite->runAction(CCAnimate::create(animation));
+            this->addChild(explosionSprite, 100);
+        }
     }
 };

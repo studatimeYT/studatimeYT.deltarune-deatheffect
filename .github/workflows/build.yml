@@ -29,7 +29,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # 🚀 Installs Geode CLI and SDK environment cleanly
       - name: Install Geode CLI and SDK
         run: |
           if [ "${{ matrix.config.os }}" = "windows-latest" ]; then
@@ -37,6 +36,12 @@ jobs:
             7z x geode-cli-v3.7.4-win.zip -y -o"$HOME/custom-geode-cli"
             echo "$HOME/custom-geode-cli" >> $GITHUB_PATH
             export PATH="$HOME/custom-geode-cli:$PATH"
+            
+            # 🚀 THE FIX: Create dummy profile directory and file for Windows
+            mkdir -p "$vivid_profile_path" # safety
+            mkdir -p "$LOCALAPPDATA/Geode"
+            echo '{"current-profile": "default", "profiles": {"default": {"name": "default", "gd-path": "C:\\"}}}' > "$LOCALAPPDATA/Geode/config.json"
+            
             geode sdk install
           else
             curl -LO https://github.com/geode-sdk/cli/releases/latest/download/geode-cli-v3.7.4-linux.zip
@@ -45,11 +50,15 @@ jobs:
             chmod +x $HOME/custom-geode-cli/geode
             echo "$HOME/custom-geode-cli" >> $GITHUB_PATH
             export PATH="$HOME/custom-geode-cli:$PATH"
+            
+            # 🚀 THE FIX: Create dummy profile directory and file for Linux/Android
+            mkdir -p "$HOME/.config/Geode"
+            echo '{"current-profile": "default", "profiles": {"default": {"name": "default", "gd-path": "/"}}}' > "$HOME/.config/Geode/config.json"
+            
             geode sdk install
           fi
         shell: bash
 
-      # 🚀 FIXED LINE 51: Removed the typo character so formatting is perfectly clean
       - name: Build the mod
         uses: geode-sdk/build-geode-mod@main
         with:

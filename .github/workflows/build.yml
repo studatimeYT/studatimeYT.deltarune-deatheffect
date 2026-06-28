@@ -29,10 +29,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # 🚀 THE FIX: Uses the stable release version which handles the CLI configuration 
-      # automatically in the background without needing a separate setup line.
+      # 🚀 FIXED: Switched from @v2 to @main to support modern Geode v3 environments cleanly
       - name: Build the mod
-        uses: geode-sdk/build-geode-mod@v2
+        uses: geode-sdk/build-geode-mod@main
         with:
           combine: true
           target: ${{ matrix.config.target }}
@@ -43,7 +42,8 @@ jobs:
     needs: ['build']
 
     steps:
-      - uses: geode-sdk/build-geode-mod/combine@v2
+      # 🚀 FIXED: Switched from /combine@v2 to /combine@main
+      - uses: geode-sdk/build-geode-mod/combine@main
         id: build
 
       - uses: actions/upload-artifact@v4

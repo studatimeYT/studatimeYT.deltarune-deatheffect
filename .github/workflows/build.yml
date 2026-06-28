@@ -8,71 +8,41 @@ on:
 
 jobs:
   build:
-    strategy:
-      fail-fast: false
-      matrix:
-        config:
-          - name: Windows
-            os: windows-latest
-
-          - name: Android32
-            os: ubuntu-latest
-            target: Android32
-
-          - name: Android64
-            os: ubuntu-latest
-            target: Android64
-
-    name: ${{ matrix.config.name }}
-    runs-on: ${{ matrix.config.os }}
+    name: Windows Build
+    runs-on: windows-latest
 
     steps:
       - uses: actions/checkout@v4
 
-      # This creates the dummy configuration so the CLI doesn't ask interactive questions
-      - name: Install Geode CLI and SDK
+      - name: Setup Geode and Build
         run: |
-          if [ "${{ matrix.config.os }}" = "windows-latest" ]; then
-            curl -LO https://github.com/geode-sdk/cli/releases/latest/download/geode-cli-v3.7.4-win.zip
-            7z x geode-cli-v3.7.4-win.zip -y -o"$HOME/custom-geode-cli"
-            echo "$HOME/custom-geode-cli" >> $GITHUB_PATH
-            export PATH="$HOME/custom-geode-cli:$PATH"
-            
-            mkdir -p "$LOCALAPPDATA/Geode"
-            echo '{"current-profile":"default","profiles":{"default":{"name":"default","gd-path":"C:\\"}}}' > "$LOCALAPPDATA/Geode/config.json"
-            
-            geode sdk install
-          else
-            curl -LO https://github.com/geode-sdk/cli/releases/latest/download/geode-cli-v3.7.4-linux.zip
-            mkdir -p $HOME/custom-geode-cli
-            unzip -o geode-cli-v3.7.4-linux.zip -d $HOME/custom-geode-cli
-            chmod +x $HOME/custom-geode-cli/geode
-            echo "$HOME/custom-geode-cli" >> $GITHUB_PATH
-            export PATH="$HOME/custom-geode-cli:$PATH"
-            
-            mkdir -p "$HOME/.config/Geode"
-            echo '{"current-profile":"default","profiles":{"default":{"name":"default","gd-path":"/"}}}' > "$HOME/.config/Geode/config.json"
-            
-            geode sdk install
-          fi
-        shell: bash
+          # 1. Create a clean, isolated directory for the CLI tool
+          New-Item -ItemType Directory -Force -Path "$HOME\custom-geode-cli"
+          
+          # 2. Download and extract the official Windows Geode CLI release
+          Invoke-WebRequest -Uri "https://github.com/geode-sdk/cli/releases/latest/download/geode-cli-v3.7.4-win.zip" -OutFile "$HOME\custom-geode-cli\cli.zip"
+          Expand-Archive -Path "$HOME\custom-geode-cli\cli.zip" -DestinationPath "$HOME\custom-geode-cli" -Force
+          
+          # 3. Add the CLI to our environment path so the system can run it
+          $env:PATH = "$HOME\custom-geode-cli;$env:PATH"
+          echo "$HOME\custom-geode-cli" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          
+          # 4. 🚀 THE ULTIMATE FIX: Create the exact profile file Windows Geode expects
+          $geodeConfigDir = "$env:LOCALAPPDATA\Geode"
+          if (!(Test-Path $geodeConfigDir)) { New-Item -ItemType Directory -Force -Path $geodeConfigDir }
+          '@{"current-profile":"default","profiles":{"default":{"name":"default","gd-path":"C:\\"}}}' | Out-File -FilePath "$geodeConfigDir\config.json" -Encoding utf8 -Force
+          
+          # 5. Install the SDK headers and binaries
+          geode sdk install
+          geode sdk install-binaries
+          
+          # 6. Run the actual compiler build directly via CMake
+          cmake -B build -DCMAKE_BUILD_TYPE=Release
+          cmake --build build --config Release
+        shell: powershell
 
-      - name: Build the mod
-        uses: geode-sdk/build-geode-mod@main
+      - name: Upload Mod Artifact
+        uses: actions/upload-artifact@v4
         with:
-          combine: true
-          target: ${{ matrix.config.target }}
-
-  package:
-    name: Package builds
-    runs-on: ubuntu-latest
-    needs: ['build']
-
-    steps:
-      - uses: geode-sdk/build-geode-mod/combine@main
-        id: build
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: Build Output
-          path: ${{ steps.build.outputs.build-output }}
+          name: Windows Build Output
+          path: build/

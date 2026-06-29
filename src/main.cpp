@@ -1,41 +1,33 @@
-#include <Geode/Geode.hpp>
-#include <Geode/modify/PlayLayer.hpp>
+#include <geode/geode.hpp>
 
 using namespace geode::prelude;
 
-class $modify(PlayLayer) {
-    void destroyPlayer(PlayerObject* player, GameObject* object) {
-        // Run the original game code first
-        PlayLayer::destroyPlayer(player, object);
-        
-        // 1. Play your custom death sound effect safely using Geode's audio manager
-        log::info("Player died, attempting to play sound and animation.");
-        geode::utils::audio::playEffect("explode_11.ogg"_spr);
+void playdeltaruneexplosion(ccnode* parent, ccpoint position) {
+    auto spriteframecache = ccspriteframecache::sharedspriteframecache();
+    
+    auto explosionsprite = ccsprite::createwithspriteframename("boom-explosion_01.png");
+    if (!explosionsprite) return;
+    
+    explosionsprite->setposition(position);
+    parent->addchild(explosionsprite);
 
-        // 2. Create an animation sequence using your 17 sprite frames
-        auto animation = CCAnimation::create();
-        for (int i = 1; i <= 17; i++) {
-            auto frameName = std::string("boom-explosion_") + (i < 10 ? "0" : "") + std::to_string(i) + ".png";
-            auto frame = CCSpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName(frameName.c_str());
-            if (frame) {
-                animation->addSpriteFrame(frame);
-            }
-        }
-        animation->setDelayPerUnit(0.05f);
-
-        // 3. Create the sprite, grab coordinates, and add it to the layer safely
-        if (player) {
-            auto explosionSprite = CCSprite::createWithSpriteFrameName("boom-explosion_01.png");
-            if (explosionSprite) {
-                // Get absolute coordinates to prevent type crashes
-                float posX = player->getPositionX();
-                float posY = player->getPositionY();
-                
-                explosionSprite->setPosition(ccp(posX, posY));
-                explosionSprite->runAction(CCAnimate::create(animation));
-                
-                this->addChild(explosionSprite, 100);
-            }
+    auto frames = ccarray::create();
+    for (int i = 1; i <= 17; i++) {
+        std::string framename = fmt::format("boom-explosion_{:02d}.png", i);
+        auto frame = spriteframecache->spriteframebyname(framename.c_str());
+        if (frame) {
+            frames->addobject(frame);
         }
     }
-};
+
+    auto animation = ccanimation::createwithspriteframes(frames, 0.04f);
+    auto animateaction = ccanimate::create(animation);
+    auto removeaction = ccremoveself::create();
+    auto sequence = ccsequence::create(animateaction, removeaction, nullptr);
+    
+    explosionsprite->runaction(sequence);
+}
+
+$execute {
+    log::info("deltarune death effect setup complete!");
+}

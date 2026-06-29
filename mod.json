@@ -1,20 +1,19 @@
 {
-	"geode": "3.0.0-beta.1",
-	"gd": {
-		"win": "2.2081",
-		"android": "2.2081"
-	},
-	"id": "studatimeYT.deltarune-deatheffect",
-	"name": "Deltarune explosion",
-	"version": "1.0.0",
-	"developer": "studatimeYT",
-	"description": "Replace death effect 19 with deltarune explosion!",
-	"resources": {
-		"sprites": [
-			"boom-explosion_*.png"
-		],
-		"files": [
-			"explode_11.ogg"
-		]
-	}
+    "geode": "3.7.4",
+    "version": "v1.0.0",
+    "id": "studatimeyt.deltarune-deatheffect",
+    "name": "deltarune death effect",
+    "developer": "studatimeyt",
+    "description": "replace death effect number 19 to the deltarune explosion!",
+    "dependencies": [],
+    "resources": {
+        "sprites": {
+            "deltarune_death": [
+                "resources/boom-explosion_*.png"
+            ]
+        },
+        "files": [
+            "resources/explode_11.ogg"
+        ]
+    }
 }

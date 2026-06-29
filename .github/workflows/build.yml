@@ -14,11 +14,9 @@ jobs:
         config:
           - name: Windows
             os: windows-latest
-
           - name: Android32
             os: ubuntu-latest
             target: Android32
-
           - name: Android64
             os: ubuntu-latest
             target: Android64
@@ -26,7 +24,6 @@ jobs:
     name: ${{ matrix.config.name }}
     runs-on: ${{ matrix.config.os }}
 
-  # 🚀 According to Geode docs, the action handles all setup headless natively
     steps:
       - uses: actions/checkout@v4
 

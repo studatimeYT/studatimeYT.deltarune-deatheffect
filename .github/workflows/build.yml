@@ -1,4 +1,4 @@
-name: Build Geode Mod
+name: build geode mod
 
 on:
   workflow_dispatch:
@@ -12,14 +12,14 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - name: Windows
+          - name: windows
             os: windows-latest
-          - name: Android32
+          - name: android32
             os: ubuntu-latest
-            target: Android32
-          - name: Android64
+            target: android32
+          - name: android64
             os: ubuntu-latest
-            target: Android64
+            target: android64
 
     name: ${{ matrix.config.name }}
     runs-on: ${{ matrix.config.os }}
@@ -27,14 +27,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Build the mod
+      - name: build the mod
         uses: geode-sdk/build-geode-mod@main
         with:
           combine: true
           target: ${{ matrix.config.target }}
 
   package:
-    name: Package builds
+    name: package builds
     runs-on: ubuntu-latest
     needs: ['build']
 
@@ -44,5 +44,5 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: Build Output
+          name: build output
           path: ${{ steps.build.outputs.build-output }}

@@ -29,33 +29,21 @@ jobs:
 
       - name: Setup Geode and Build
         run: |
-          # 1. Create a clean directory for the CLI tool
           New-Item -ItemType Directory -Force -Path "$HOME\custom-geode-cli"
-          
-          # 2. Download and extract the Windows Geode CLI release
           Invoke-WebRequest -Uri "https://github.com/geode-sdk/cli/releases/latest/download/geode-cli-v3.7.4-win.zip" -OutFile "$HOME\custom-geode-cli\cli.zip"
           Expand-Archive -Path "$HOME\custom-geode-cli\cli.zip" -DestinationPath "$HOME\custom-geode-cli" -Force
-          
-          # 3. Add the CLI to our environment path
           $env:PATH = "$HOME\custom-geode-cli;$env:PATH"
           echo "$HOME\custom-geode-cli" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-          
-          # 4. Create the profile file Geode expects to skip the interactive wizard
           $geodeConfigDir = "$env:LOCALAPPDATA\Geode"
           if (!(Test-Path $geodeConfigDir)) { New-Item -ItemType Directory -Force -Path $geodeConfigDir }
           '@{"current-profile":"default","profiles":{"default":{"name":"default","gd-path":"C:\\"}}}' | Out-File -FilePath "$geodeConfigDir\config.json" -Encoding utf8 -Force
-          
-          # 5. Install the SDK structures
           geode sdk install
           geode sdk install-binaries
-          
-          # 6. Run the compiler build directly via CMake based on the matrix target
           if ("${{ matrix.config.target }}" -eq "Windows") {
-            cmake -B build -DCMAKE_BUILD_TYPE=Release
+            cmake -B build -G "Ninja" -DCMAKE_BUILD_TYPE=Release
             cmake --build build --config Release
           } else {
-            # For Android compilation targets
-            cmake -B build -DCMAKE_BUILD_TYPE=Release -DGEODE_TARGET="${{ matrix.config.target }}"
+            cmake -B build -G "Ninja" -DCMAKE_BUILD_TYPE=Release -DGEODE_TARGET="${{ matrix.config.target }}"
             cmake --build build --config Release
           }
         shell: powershell
@@ -64,4 +52,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Build Output - ${{ matrix.config.name }}
-          path: build/
+          path: build/*.geode
